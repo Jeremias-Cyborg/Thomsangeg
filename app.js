@@ -2,14 +2,25 @@
 const express = require('express');
 const app = express();
 
-// Wrap all route methods to detect bad paths
+// Wrap all app methods to detect bad paths
 ['use', 'get', 'post', 'put', 'delete', 'patch', 'options'].forEach(method => {
   const original = app[method];
-  app[method] = function(path) {
+  app[method] = function(path, ...args) {
     if (typeof path === 'string' && path.startsWith('http')) {
       console.error(`🚨 BAD ROUTE PATH DETECTED in app.${method}:`, path);
     }
-    return original.apply(this, arguments);
+    // If path is a router, wrap its methods too
+    if (path && path.stack && Array.isArray(path.stack)) {
+      path.stack.forEach(layer => {
+        if (layer.route) {
+          const routePath = layer.route.path;
+          if (typeof routePath === 'string' && routePath.startsWith('http')) {
+            console.error(`🚨 BAD ROUTE PATH DETECTED in nested router:`, routePath);
+          }
+        }
+      });
+    }
+    return original.apply(this, [path, ...args]);
   }
 });
 
@@ -51,7 +62,7 @@ app.get('/', (req, res) => {
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
-  secure: true,
+  secure: true, // true for 465, false for 587
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
@@ -94,8 +105,6 @@ app.post('/send-email', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-
 
 
 
