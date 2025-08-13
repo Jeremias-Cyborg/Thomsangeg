@@ -1,37 +1,26 @@
+// ================= DEBUG WRAPPER – MUST BE FIRST =================
 const express = require('express');
+const app = express();
+
+// Wrap all route methods to detect bad paths
+['use', 'get', 'post', 'put', 'delete', 'patch', 'options'].forEach(method => {
+  const original = app[method];
+  app[method] = function(path) {
+    if (typeof path === 'string' && path.startsWith('http')) {
+      console.error(`🚨 BAD ROUTE PATH DETECTED in app.${method}:`, path);
+    }
+    return original.apply(this, arguments);
+  }
+});
+
+// ================= MODULES =================
 const bodyParser = require('body-parser');
 const cors = require("cors");
 const nodemailer = require('nodemailer');
 const path = require('path');
 require('dotenv').config();
 
-const app = express();
 const PORT = process.env.PORT || 3000;
-
-// 🚨 Debug: detect bad route paths before Express registers them
-const originalUse = app.use;
-app.use = function (path) {
-  if (typeof path === "string" && path.startsWith("http")) {
-    console.error("🚨 BAD ROUTE PATH DETECTED in app.use:", path);
-  }
-  return originalUse.apply(this, arguments);
-};
-
-const originalGet = app.get;
-app.get = function (path) {
-  if (typeof path === "string" && path.startsWith("http")) {
-    console.error("🚨 BAD ROUTE PATH DETECTED in app.get:", path);
-  }
-  return originalGet.apply(this, arguments);
-};
-
-const originalPost = app.post;
-app.post = function (path) {
-  if (typeof path === "string" && path.startsWith("http")) {
-    console.error("🚨 BAD ROUTE PATH DETECTED in app.post:", path);
-  }
-  return originalPost.apply(this, arguments);
-};
 
 // ================= CORS CONFIG =================
 const corsOptions = {
@@ -62,7 +51,7 @@ app.get('/', (req, res) => {
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
-  secure: true, // true for port 465, false for 587
+  secure: true,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
@@ -83,7 +72,7 @@ transporter.verify((error, success) => {
 // ================= ROUTES =================
 app.post('/send-email', async (req, res) => {
   const { user_name, user_email, user_phone, user_service_requested, user_message } = req.body;
-  
+
   try {
     await transporter.sendMail({
       from: process.env.SMTP_USER,
@@ -92,21 +81,12 @@ app.post('/send-email', async (req, res) => {
       subject: user_service_requested || 'New Contact Form Message',
       text: `Name: ${user_name}\nEmail: ${user_email}\nPhone: ${user_phone}\nService: ${user_service_requested}\nMessage: ${user_message}`
     });
-    
+
     console.log('Email sent successfully');
     res.status(200).json({ success: true, message: 'Email sent successfully!' });
   } catch (error) {
     console.log('Email send error:', error);
-    res.status(500).json({ success: false, message: 'Failed to send email.', error });
-  }
-});
-
-// ================= START SERVER =================
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-
+    res.status(500).json({ success: false, message: 'Failed to send email.', e
 
 
 
