@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require("cors")
+const cors = require("cors");
 const nodemailer = require('nodemailer');
 const path = require('path');
 require('dotenv').config();
@@ -8,7 +8,32 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// CORS configuration
+// 🚨 Debug: detect bad route paths before Express registers them
+const originalUse = app.use;
+app.use = function (path) {
+  if (typeof path === "string" && path.startsWith("http")) {
+    console.error("🚨 BAD ROUTE PATH DETECTED in app.use:", path);
+  }
+  return originalUse.apply(this, arguments);
+};
+
+const originalGet = app.get;
+app.get = function (path) {
+  if (typeof path === "string" && path.startsWith("http")) {
+    console.error("🚨 BAD ROUTE PATH DETECTED in app.get:", path);
+  }
+  return originalGet.apply(this, arguments);
+};
+
+const originalPost = app.post;
+app.post = function (path) {
+  if (typeof path === "string" && path.startsWith("http")) {
+    console.error("🚨 BAD ROUTE PATH DETECTED in app.post:", path);
+  }
+  return originalPost.apply(this, arguments);
+};
+
+// ================= CORS CONFIG =================
 const corsOptions = {
   origin: [
     "https://www.thomsangeg.com", // Production
@@ -18,27 +43,25 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"]
 };
 
-// Apply CORS to all routes
 app.use(cors(corsOptions));
-
-// Handle preflight requests globally
 app.options("*", cors(corsOptions));
 
+// ================= MIDDLEWARE =================
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Serve static files from the public directory
+// Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Send index.html for the root route
+// Root route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Corporate email transporter setup
+// ================= EMAIL CONFIG =================
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT, // try 587 if you get connection errors
+  port: process.env.SMTP_PORT,
   secure: true, // true for port 465, false for 587
   auth: {
     user: process.env.SMTP_USER,
@@ -49,8 +72,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Verify SMTP connection
-transporter.verify(function(error, success) {
+transporter.verify((error, success) => {
   if (error) {
     console.log('SMTP connection error:', error);
   } else {
@@ -58,14 +80,15 @@ transporter.verify(function(error, success) {
   }
 });
 
+// ================= ROUTES =================
 app.post('/send-email', async (req, res) => {
-  const { user_name, user_email,user_phone, user_service_requested, user_message } = req.body;
+  const { user_name, user_email, user_phone, user_service_requested, user_message } = req.body;
   
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_USER, // must match SMTP user
-      to: process.env.SMTP_USER, // or your desired recipient
-      replyTo: user_email, // client's email for reply
+      from: process.env.SMTP_USER,
+      to: process.env.SMTP_USER,
+      replyTo: user_email,
       subject: user_service_requested || 'New Contact Form Message',
       text: `Name: ${user_name}\nEmail: ${user_email}\nPhone: ${user_phone}\nService: ${user_service_requested}\nMessage: ${user_message}`
     });
@@ -78,6 +101,7 @@ app.post('/send-email', async (req, res) => {
   }
 });
 
+// ================= START SERVER =================
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
