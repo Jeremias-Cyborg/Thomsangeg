@@ -86,10 +86,14 @@ app.post('/send-email', async (req, res) => {
     res.status(200).json({ success: true, message: 'Email sent successfully!' });
   } catch (error) {
     console.log('Email send error:', error);
-    res.status(500).json({ success: false, message: 'Failed to send email.', e
+    res.status(500).json({ success: false, message: 'Failed to send email.', error });
+  }
+});
 
-
-
+// ================= START SERVER =================
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 
 
