@@ -8,7 +8,22 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// CORS configuration
+const corsOptions = {
+  origin: [
+    "https://www.thomsangeg.com", // Production
+    "http://localhost:3000"       // Development
+  ],
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+};
+
+// Apply CORS to all routes
+app.use(cors(corsOptions));
+
+// Handle preflight requests globally
+app.options("*", cors(corsOptions));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
