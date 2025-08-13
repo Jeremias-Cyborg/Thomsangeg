@@ -58,18 +58,6 @@ transporter.verify(function(error, success) {
   }
 });
 
-
-// Enable CORS for your live domain + localhost (for testing)
-app.use(cors({
-  origin: [
-    "https://www.thomsangeg.com",  // production domain
-    "http://localhost:3000"        // development
-  ],
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
-
-
 app.post('/send-email', async (req, res) => {
   const { user_name, user_email,user_phone, user_service_requested, user_message } = req.body;
   
