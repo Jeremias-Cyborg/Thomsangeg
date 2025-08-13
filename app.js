@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 // Corporate email transporter setup
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: process.env.PORT, // try 587 if you get connection errors
+  port: process.env.SMTP_PORT, // try 587 if you get connection errors
   secure: true, // true for port 465, false for 587
   auth: {
     user: process.env.SMTP_USER,
@@ -43,6 +43,10 @@ transporter.verify(function(error, success) {
   }
 });
 
+const cors = require('cors');
+app.use(cors({
+  origin: '*', // For testing; restrict to your frontend domain in production
+}));
 
 app.post('/send-email', async (req, res) => {
   const { user_name, user_email,user_phone, user_service_requested, user_message } = req.body;
