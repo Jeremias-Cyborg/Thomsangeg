@@ -22,8 +22,8 @@ app.get('/', (req, res) => {
 
 // Corporate email transporter setup
 const transporter = nodemailer.createTransport({
-  host: 'smtp.panel247.com',
-  port: 465, // try 587 if you get connection errors
+  host: process.env.SMTP_HOST,
+  port: process.env.PORT, // try 587 if you get connection errors
   secure: true, // true for port 465, false for 587
   auth: {
     user: process.env.SMTP_USER,

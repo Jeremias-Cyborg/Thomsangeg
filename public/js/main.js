@@ -55,6 +55,9 @@
     });
 })(jQuery);
 
+ const API_URL= window.location.hostname === 'localhost'
+  ? 'http://localhost:3000/send-email'
+  : 'https://thomsangeg.onrender.com/send-email';
 
 //Function to handle any form submission ...
 document.addEventListener('DOMContentLoaded', function () {
@@ -79,9 +82,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const user_service_requested=document.getElementById("cage").value;
             const user_message=document.getElementById("message").value;
             
-
+           
+            console.log(API_URL);
             
-            fetch('http://my-node-app.onrender.com/send-email', {
+            
+            fetch(`${API_URL}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_name, user_email, user_phone, user_service_requested, user_message })
