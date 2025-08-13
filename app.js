@@ -1,34 +1,32 @@
 // ================= MODULES =================
-import express from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import nodemailer from 'nodemailer';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require('express');
+const bodyParser = require('body-parser');
+const nodemailer = require('nodemailer');
+const path = require('path');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ================= CORS CONFIG =================
-const corsOptions = {
-  origin: [
-    "https://www.thomsangeg.com",
-    "https://thomsangeg.com",
-    "http://localhost:3000"
-  ],
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-};
+// ================= CORS =================
+const allowedOrigins = [
+  'https://www.thomsangeg.com',
+  'https://thomsangeg.com',
+  'http://localhost:3000'
+];
 
-// Apply CORS globally
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204); // respond to preflight
+  }
+  next();
+});
 
 // ================= MIDDLEWARE =================
 app.use(bodyParser.json());
@@ -46,11 +44,10 @@ app.get('/', (req, res) => {
 app.post('/send-email', async (req, res) => {
   const { user_name, user_email, user_phone, user_service_requested, user_message } = req.body;
 
-  // Nodemailer transporter
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
-    secure: true,
+    secure: true, // true for 465
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS
@@ -78,7 +75,6 @@ app.post('/send-email', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
 
 
 
