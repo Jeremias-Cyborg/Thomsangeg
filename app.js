@@ -1,36 +1,12 @@
-// ================= DEBUG WRAPPER – MUST BE FIRST =================
-const express = require('express');
-const app = express();
-
-// Wrap all app methods to detect bad paths
-['use', 'get', 'post', 'put', 'delete', 'patch', 'options'].forEach(method => {
-  const original = app[method];
-  app[method] = function(path, ...args) {
-    if (typeof path === 'string' && path.startsWith('http')) {
-      console.error(`🚨 BAD ROUTE PATH DETECTED in app.${method}:`, path);
-    }
-    // If path is a router, wrap its methods too
-    if (path && path.stack && Array.isArray(path.stack)) {
-      path.stack.forEach(layer => {
-        if (layer.route) {
-          const routePath = layer.route.path;
-          if (typeof routePath === 'string' && routePath.startsWith('http')) {
-            console.error(`🚨 BAD ROUTE PATH DETECTED in nested router:`, routePath);
-          }
-        }
-      });
-    }
-    return original.apply(this, [path, ...args]);
-  }
-});
-
 // ================= MODULES =================
+const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require("cors");
 const nodemailer = require('nodemailer');
 const path = require('path');
 require('dotenv').config();
 
+const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ================= CORS CONFIG =================
@@ -53,36 +29,30 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ================= ROUTES =================
+
 // Root route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ================= EMAIL CONFIG =================
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: true, // true for 465, false for 587
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  },
-  tls: {
-    rejectUnauthorized: false
-  }
-});
-
-transporter.verify((error, success) => {
-  if (error) {
-    console.log('SMTP connection error:', error);
-  } else {
-    console.log('SMTP server is ready to take messages');
-  }
-});
-
-// ================= ROUTES =================
+// Send email route (relative path)
 app.post('/send-email', async (req, res) => {
   const { user_name, user_email, user_phone, user_service_requested, user_message } = req.body;
+
+  // ================= EMAIL CONFIG =================
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: true,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
 
   try {
     await transporter.sendMail({
@@ -105,11 +75,6 @@ app.post('/send-email', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-
-
-
-
 
 
 
