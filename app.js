@@ -43,10 +43,6 @@ transporter.verify(function(error, success) {
   }
 });
 
-const cors = require('cors');
-app.use(cors({
-  origin: '*', // For testing; restrict to your frontend domain in production
-}));
 
 app.post('/send-email', async (req, res) => {
   const { user_name, user_email,user_phone, user_service_requested, user_message } = req.body;
