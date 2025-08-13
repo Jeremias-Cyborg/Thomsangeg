@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-import cors from 'cors';
+const cors = require("cors")
 const nodemailer = require('nodemailer');
 const path = require('path');
 require('dotenv').config();
@@ -44,12 +44,16 @@ transporter.verify(function(error, success) {
 });
 
 
-// Allow only your domain
+// Enable CORS for your live domain + localhost (for testing)
 app.use(cors({
-  origin: "https://www.thomsangeg.com",
+  origin: [
+    "https://www.thomsangeg.com",  // production domain
+    "http://localhost:3000"        // development
+  ],
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
 
 app.post('/send-email', async (req, res) => {
   const { user_name, user_email,user_phone, user_service_requested, user_message } = req.body;
