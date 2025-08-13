@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors');
+import cors from 'cors';
 const nodemailer = require('nodemailer');
 const path = require('path');
 require('dotenv').config();
@@ -43,6 +43,13 @@ transporter.verify(function(error, success) {
   }
 });
 
+
+// Allow only your domain
+app.use(cors({
+  origin: "https://www.thomsangeg.com",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 app.post('/send-email', async (req, res) => {
   const { user_name, user_email,user_phone, user_service_requested, user_message } = req.body;
