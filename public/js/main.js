@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
 
             
-            fetch('http://localhost:3000/send-email', {
+            fetch('http://my-node-app.onrender.com/send-email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_name, user_email, user_phone, user_service_requested, user_message })
