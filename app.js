@@ -71,6 +71,11 @@ app.post('/send-email', async (req, res) => {
   }
 });
 
+// ================= 404 HANDLER =================
+app.use((req, res, next) => {
+  res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+});
+
 // ================= START SERVER =================
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
