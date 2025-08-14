@@ -2,7 +2,7 @@
     "use strict";
 
     // Spinner
-    var spinner = function () {
+    /*var spinner = function () {
         setTimeout(function () {
             var el = document.getElementById('spinner');
             if (el) {
@@ -11,7 +11,7 @@
         }, 300); // slight delay for smoother fade-out
     };
 
-    window.addEventListener('load', spinner);
+    window.addEventListener('load', spinner);*/
     
     
     // Initiate the wowjs
