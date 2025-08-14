@@ -4,12 +4,14 @@
     // Spinner
     var spinner = function () {
         setTimeout(function () {
-            if ($('#spinner').length > 0) {
-                $('#spinner').removeClass('show');
+            var el = document.getElementById('spinner');
+            if (el) {
+                el.classList.remove('show');
             }
-        }, 1);
+        }, 300); // slight delay for smoother fade-out
     };
-    spinner();
+
+    window.addEventListener('load', spinner);
     
     
     // Initiate the wowjs
