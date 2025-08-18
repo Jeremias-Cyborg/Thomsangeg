@@ -1,10 +1,37 @@
 /********** Template CSS **********/
 :root {
-    --primary: #2b3cfd;
-    --secondary: #e73111;
+    --primary: #FDA12B;
+    --secondary: #8D9297;
     --light: #F8F9FA;
-    --dark: #07912c;
+    --dark: #182333;
 }
+
+img .w-100 {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+
+h1 {
+    color: var(blue);
+}
+
+h2 {
+    color: var(green);
+}
+
+h3,
+h4 {
+    color: var(red);
+}
+
+p {
+    color: var(--text-gray);
+    line-height: 1.6;
+}
+
 
 .back-to-top {
     position: fixed;
@@ -14,6 +41,9 @@
     z-index: 99;
 }
 
+.bg-primary {
+    background: var(blue) !important;
+}
 
 /*** Spinner ***/
 #spinner {
@@ -97,7 +127,7 @@
 }
 
 @media (max-width: 991.98px) {
-    .navbar .navbar-nav .nav-link  {
+    .navbar .navbar-nav .nav-link {
         margin-left: 0;
         padding: 10px 0;
     }
@@ -168,7 +198,7 @@
         position: relative;
         min-height: 450px;
     }
-    
+
     #header-carousel .carousel-item img {
         position: absolute;
         width: 100%;
@@ -252,18 +282,22 @@
 #header-carousel .carousel-item img,
 .carousel-inner .carousel-item img {
     width: 100%;
-    height: 85vh;         /* 70% of viewport height for laptops and up */
+    height: 85vh;
+    /* 70% of viewport height for laptops and up */
     object-fit: cover;
     object-position: center;
     display: block;
 }
 
 @media (max-width: 768px) {
+
     #header-carousel .carousel-item img,
     .carousel-inner .carousel-item img {
-        height: 50vh;     /* 50% of viewport height for phones */
+        height: 50vh;
+        /* 50% of viewport height for phones */
     }
 }
+
 /*** Appointment ***/
 .appointment {
     background: linear-gradient(rgba(0, 0, 0, .65), rgba(0, 0, 0, .65)), url(../img/carousel-2.jpg) center center no-repeat;
