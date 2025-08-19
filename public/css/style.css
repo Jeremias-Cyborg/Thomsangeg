@@ -6,6 +6,10 @@
     --dark: #182333;
 }
 
+body {
+    padding-bottom: 0x;
+    /* adjust to your footer height */
+}
 
 
 .back-to-top {
@@ -335,46 +339,100 @@
 
 
 /*** Footer ***/
+/* Make sure footer sticks to bottom */
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    flex: 1;
+    /* Pushes footer down */
+}
+
+/* Footer */
+/* Reset default spacing */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  font-family: Arial, sans-serif;
+}
+
+/* Footer styles */
 .footer {
-    color: #999999;
+  width: 100vw;
+  background-color: #182333;
+  color: white;
+  padding: 40px 20px 20px;
 }
 
-.footer .btn.btn-link {
-    display: block;
-    margin-bottom: 5px;
-    padding: 0;
-    text-align: left;
-    color: #999999;
-    font-weight: normal;
-    text-transform: capitalize;
-    transition: .3s;
+.footer-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.footer .btn.btn-link::before {
-    position: relative;
-    content: "\f105";
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    color: #999999;
-    margin-right: 10px;
+.footer-column {
+  flex: 1 1 300px;
+  margin: 20px;
 }
 
-.footer .btn.btn-link:hover {
-    color: var(--light);
-    letter-spacing: 1px;
-    box-shadow: none;
+.footer-column h1,
+.footer-column h4 {
+  margin-bottom: 15px;
+  color: #ffffff;
 }
 
-.footer .copyright {
-    padding: 25px 0;
-    font-size: 15px;
-    border-top: 1px solid rgba(256, 256, 256, .1);
+.footer-column p,
+.footer-column a {
+  color: #cccccc;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 8px;
 }
 
-.footer .copyright a {
-    color: var(--light);
+.footer-column a:hover {
+  color: #ffffff;
 }
 
-.footer .copyright a:hover {
-    color: var(--primary);
+/* Social icons */
+.social-icons a {
+  display: inline-block;
+  margin-right: 10px;
+  color: #cccccc;
+  font-size: 20px;
+}
+
+.social-icons a:hover {
+  color: #ffffff;
+}
+
+/* Footer bottom */
+.footer-bottom {
+  text-align: center;
+  padding-top: 20px;
+  font-size: 14px;
+  color: #aaaaaa;
+}
+
+.footer-bottom a {
+  color: #cccccc;
+  text-decoration: none;
+}
+
+.footer-bottom a:hover {
+  color: #ffffff;
 }
