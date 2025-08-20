@@ -1,7 +1,7 @@
 /********** Template CSS **********/
 :root {
-    --primary: #FDA12B;
-    --secondary: #8D9297;
+    --primary: #362bfd;
+    --secondary: #d51a05;
     --light: #F8F9FA;
     --dark: #182333;
 }
@@ -9,8 +9,33 @@
 body {
     padding-bottom: 0x;
     /* adjust to your footer height */
+    
+}
+h1{
+    color: darkblue
+}
+h2{
+    color: var(--secondary);
 }
 
+.bg-primary {
+    background-color: var(--secondary) !important;
+}
+.border-primary {
+    border-color: var(--secondary) !important;
+}
+a ,i{
+    color: var(--secondary);
+}
+.text-primary {
+    color: green !important;
+}
+
+.btn.btn-square.border-end.border-start, .btn.btn-square.border-end{
+    color: black;
+    background-color: var(--light) !important;
+    border-color: var(--light) !important;
+}
 
 .back-to-top {
     position: fixed;
@@ -41,6 +66,8 @@ body {
 .btn {
     font-weight: 500;
     transition: .5s;
+    background-color: var(--secondary);
+    border-color: #d51a05;
 }
 
 .btn.btn-primary,
