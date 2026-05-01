@@ -127,6 +127,12 @@ setInterval(() => {
 }, WINDOW_MS);
 
 // ================= NODEMAILER TRANSPORTER =================
+// Validate SMTP configuration before creating transporter
+if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn('⚠️  Warning: SMTP configuration is incomplete. Email sending will fail.');
+    console.warn('Required env variables: SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_PORT');
+}
+
 // Create ONE transporter at startup with connection pooling.
 // Previously this was created inside the route handler — that opened a new
 // SMTP TCP connection on every form submission, adding ~200-500ms latency.
@@ -142,6 +148,16 @@ const transporter = nodemailer.createTransport({
     pool: true,          // reuse SMTP connections across requests
     maxConnections: 5,   // cap concurrent connections
     maxMessages: 100     // recycle connection after 100 sends
+});
+
+// Verify transporter connection on startup
+transporter.verify((error, success) => {
+    if (error) {
+        console.error('❌ SMTP connection failed:', error.message);
+        console.error('Please check your SMTP credentials in the .env file');
+    } else {
+        console.log('✅ SMTP server is ready to send emails');
+    }
 });
 
 // ================= ROUTES =================
@@ -160,32 +176,43 @@ app.get('/home', (req, res) => {
 app.post('/send-email', emailRateLimiter, async (req, res) => {
     const { user_name, user_email, user_phone, user_service_requested, user_message } = req.body;
 
-    if (!user_name || !user_email) {
-        return res.status(400).json({ success: false, message: 'Name and email are required.' });
+    // Validate required fields
+    if (!user_name || !user_name.trim()) {
+        return res.status(400).json({ success: false, message: 'Name is required.' });
+    }
+
+    if (!user_email || !user_email.trim()) {
+        return res.status(400).json({ success: false, message: 'Email is required.' });
     }
 
     // Basic email format check — prevents obviously malformed addresses
     // from reaching the SMTP server and causing a slow rejection.
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(user_email)) {
+    if (!emailRegex.test(user_email.trim())) {
         return res.status(400).json({ success: false, message: 'Invalid email address.' });
     }
 
-    try {
-        await transporter.sendMail({
-            from: process.env.SMTP_USER,
-            to: process.env.SMTP_USER,
-            replyTo: user_email,
-            subject: user_service_requested || 'New Contact Form Message',
-            text: `Name: ${user_name}\nEmail: ${user_email}\nPhone: ${user_phone || 'N/A'}\nService: ${user_service_requested || 'N/A'}\nMessage: ${user_message || ''}`
-        });
+    // Trim all inputs to prevent empty strings
+    const mailOptions = {
+        from: process.env.SMTP_USER,
+        to: process.env.SMTP_USER,
+        replyTo: user_email.trim(),
+        subject: (user_service_requested && user_service_requested.trim()) || 'New Contact Form Message',
+        text: `Name: ${user_name.trim()}\nEmail: ${user_email.trim()}\nPhone: ${user_phone && user_phone.trim() ? user_phone.trim() : 'N/A'}\nService: ${user_service_requested && user_service_requested.trim() ? user_service_requested.trim() : 'N/A'}\nMessage: ${user_message && user_message.trim() ? user_message.trim() : 'No message provided'}`
+    };
 
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log('✅ Email sent successfully:', info.messageId);
         res.status(200).json({ success: true, message: 'Email sent successfully!' });
     } catch (error) {
         // Log internally but never expose error details to the client —
         // stack traces can leak SMTP credentials or server internals.
-        console.error('Email send error:', error.message);
-        res.status(500).json({ success: false, message: 'Failed to send email. Please try again.' });
+        console.error('❌ Email send error:', error.message);
+        console.error('Error details:', error.code || 'Unknown error');
+        
+        // Provide user-friendly error message
+        res.status(500).json({ success: false, message: 'Failed to send email. Please try again later.' });
     }
 });
 
@@ -196,5 +223,5 @@ app.use((req, res) => {
 
 // ================= START SERVER =================
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
 });
