@@ -8,6 +8,9 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy if behind a reverse proxy (for accurate IP detection)
+app.set('trust proxy', 1);
+
 // ================= COMPRESSION =================
 // Gzip all responses. Reduces bootstrap.min.css from 160KB → ~25KB over the wire.
 // Threshold: compress anything over 1KB (below that, overhead outweighs savings).
@@ -97,17 +100,33 @@ const emailRequests = new Map();
 const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 const MAX_REQUESTS = 5;            // max 5 form submissions per IP per window
 
+function getClientIp(req) {
+    // Try to get the real IP from various sources
+    return (
+        req.headers['x-forwarded-for']?.split(',')[0].trim() ||
+        req.headers['x-real-ip'] ||
+        req.ip ||
+        req.socket.remoteAddress ||
+        req.connection.remoteAddress ||
+        'unknown'
+    );
+}
+
 function emailRateLimiter(req, res, next) {
-    const ip = req.ip || req.socket.remoteAddress;
+    const ip = getClientIp(req);
     const now = Date.now();
     const record = emailRequests.get(ip);
 
+    console.log(`Rate limit check - IP: ${ip}, Current requests: ${record ? record.count : 0}/${MAX_REQUESTS}`);
+
     if (!record || now - record.windowStart > WINDOW_MS) {
         emailRequests.set(ip, { windowStart: now, count: 1 });
+        console.log(`✅ Rate limit reset for IP ${ip}`);
         return next();
     }
 
     if (record.count >= MAX_REQUESTS) {
+        console.warn(`⚠️  Rate limit exceeded for IP ${ip}: ${record.count}/${MAX_REQUESTS}`);
         return res.status(429).json({
             success: false,
             message: 'Too many requests. Please wait before submitting again.'
@@ -115,14 +134,22 @@ function emailRateLimiter(req, res, next) {
     }
 
     record.count++;
+    console.log(`Rate limit incremented for IP ${ip}: ${record.count}/${MAX_REQUESTS}`);
     next();
 }
 
 // Periodically purge stale rate-limit records to avoid memory growth.
 setInterval(() => {
     const cutoff = Date.now() - WINDOW_MS;
+    let purgedCount = 0;
     for (const [ip, record] of emailRequests.entries()) {
-        if (record.windowStart < cutoff) emailRequests.delete(ip);
+        if (record.windowStart < cutoff) {
+            emailRequests.delete(ip);
+            purgedCount++;
+        }
+    }
+    if (purgedCount > 0) {
+        console.log(`🧹 Purged ${purgedCount} stale rate-limit records`);
     }
 }, WINDOW_MS);
 
@@ -176,12 +203,17 @@ app.get('/home', (req, res) => {
 app.post('/send-email', emailRateLimiter, async (req, res) => {
     const { user_name, user_email, user_phone, user_service_requested, user_message } = req.body;
 
+    console.log('📧 Email form submitted');
+    console.log('Data received:', { user_name, user_email, user_phone, user_service_requested });
+
     // Validate required fields
     if (!user_name || !user_name.trim()) {
+        console.warn('❌ Validation failed: Name is empty');
         return res.status(400).json({ success: false, message: 'Name is required.' });
     }
 
     if (!user_email || !user_email.trim()) {
+        console.warn('❌ Validation failed: Email is empty');
         return res.status(400).json({ success: false, message: 'Email is required.' });
     }
 
@@ -189,6 +221,7 @@ app.post('/send-email', emailRateLimiter, async (req, res) => {
     // from reaching the SMTP server and causing a slow rejection.
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(user_email.trim())) {
+        console.warn('❌ Validation failed: Invalid email format:', user_email);
         return res.status(400).json({ success: false, message: 'Invalid email address.' });
     }
 
@@ -202,6 +235,7 @@ app.post('/send-email', emailRateLimiter, async (req, res) => {
     };
 
     try {
+        console.log('📤 Attempting to send email...');
         const info = await transporter.sendMail(mailOptions);
         console.log('✅ Email sent successfully:', info.messageId);
         res.status(200).json({ success: true, message: 'Email sent successfully!' });
@@ -209,7 +243,7 @@ app.post('/send-email', emailRateLimiter, async (req, res) => {
         // Log internally but never expose error details to the client —
         // stack traces can leak SMTP credentials or server internals.
         console.error('❌ Email send error:', error.message);
-        console.error('Error details:', error.code || 'Unknown error');
+        console.error('Error code:', error.code || 'Unknown error');
         
         // Provide user-friendly error message
         res.status(500).json({ success: false, message: 'Failed to send email. Please try again later.' });
