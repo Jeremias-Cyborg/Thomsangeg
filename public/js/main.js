@@ -64,12 +64,24 @@ document.addEventListener('DOMContentLoaded', function () {
         form.addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            // Collect form data
-            const user_name = document.getElementById("gname").value;
-            const user_email = document.getElementById("gmail").value;
-            const user_phone = document.getElementById("cname").value;
-            const user_service_requested = document.getElementById("cage").value;
-            const user_message = document.getElementById("message").value;
+            // Get form inputs more safely - scoped to the specific form
+            const gNameInput = form.querySelector('#gname');
+            const gEmailInput = form.querySelector('#gmail');
+            const cNameInput = form.querySelector('#cname');
+            const cAgeInput = form.querySelector('#cage');
+            const messageInput = form.querySelector('#message');
+
+            // Only process if this form has the required fields
+            if (!gNameInput || !gEmailInput) {
+                console.error('Form does not have required fields (gname, gmail)');
+                return;
+            }
+
+            const user_name = gNameInput.value;
+            const user_email = gEmailInput.value;
+            const user_phone = cNameInput ? cNameInput.value : '';
+            const user_service_requested = cAgeInput ? cAgeInput.value : '';
+            const user_message = messageInput ? messageInput.value : '';
 
             // Relative API path
             const API_URL = '/send-email';
@@ -85,6 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (data.success) {
                     showTopUpMessage('Your email was sent successfully!');
+                    form.reset(); // Clear the form after successful submission
                 } else {
                     showTopUpMessage('There was a problem sending your email. Please try again later.', true);
                 }
@@ -114,15 +127,3 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
-
-
-
-
-
-
-
-
-
-
-
-
