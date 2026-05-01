@@ -150,6 +150,13 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Redirect old WordPress /home URL to homepage
+// This tells Google permanently that /home has moved to the real homepage,
+// clearing the duplicate canonical issue faster.
+app.get('/home', (req, res) => {
+    res.redirect(301, 'https://www.thomsangeg.com/');
+});
+
 app.post('/send-email', emailRateLimiter, async (req, res) => {
     const { user_name, user_email, user_phone, user_service_requested, user_message } = req.body;
 
