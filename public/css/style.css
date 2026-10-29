@@ -102,9 +102,13 @@ a ,i{
 
 
 /*** Navbar ***/
-.navbar.sticky-top {
-    top: -100px;
-    transition: .5s;
+/* Topbar + navbar stay fixed at the top while scrolling */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background: #FFFFFF;
+    transition: box-shadow .3s;
 }
 
 .navbar .navbar-nav .nav-link {
