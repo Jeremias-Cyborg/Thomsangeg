@@ -1,6 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /js/
-Disallow: /lib/
 
 Sitemap: https://www.thomsangeg.com/sitemap.xml

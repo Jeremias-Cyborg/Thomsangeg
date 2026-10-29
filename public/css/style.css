@@ -238,7 +238,7 @@ a ,i{
 
 
 .page-header {
-    background: linear-gradient(rgba(0, 0, 0, .65), rgba(0, 0, 0, .65)), url(../img/carousel-1.jpg) center center no-repeat;
+    background: linear-gradient(rgba(0, 0, 0, .65), rgba(0, 0, 0, .65)), url(../img/hero/hero-safety-briefing.jpg) center center no-repeat;
     background-size: cover;
 }
 
@@ -482,4 +482,168 @@ html, body {
 
 .footer-bottom a:hover {
   color: #ffffff;
+}
+
+/*** Projects page (SOMJ Technology) ***/
+.project-filter {
+    border: 2px solid var(--secondary);
+    background: transparent;
+    color: var(--dark);
+    font-weight: 500;
+    padding: 8px 18px;
+    transition: .3s;
+}
+.project-filter:hover,
+.project-filter.active {
+    background: var(--secondary);
+    color: #FFFFFF;
+}
+.project-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #FFFFFF;
+    border-bottom: 4px solid var(--dark);
+    box-shadow: 0 6px 24px rgba(11, 31, 58, .08);
+    transition: .3s;
+}
+.project-card:hover {
+    transform: translateY(-6px);
+    border-bottom-color: var(--secondary);
+}
+.project-media {
+    position: relative;
+}
+.project-img {
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    background: #F4F6F9;
+}
+.project-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: .5s;
+}
+.project-card:hover .project-img img {
+    transform: scale(1.05);
+}
+.project-img-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--dark);
+}
+.project-img-logo img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+}
+.project-tag {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    background: var(--secondary);
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    padding: 6px 14px;
+}
+.project-sample {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #FFC107;
+    color: #000000;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 10px;
+}
+.project-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 24px;
+}
+.project-title {
+    min-height: 2.6em;
+}
+.project-meta {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 15px 0;
+    font-size: 14px;
+}
+.project-meta li {
+    margin-bottom: 6px;
+}
+.project-meta i {
+    width: 20px;
+    color: var(--secondary);
+    margin-right: 6px;
+}
+.project-desc {
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+
+/*** Uniform hero banner on every page (SOMJ Technology) ***/
+/* body is a flex column (sticky footer), so sections must not shrink */
+body > * {
+    flex-shrink: 0;
+}
+:root {
+    --hero-h: clamp(420px, 65vh, 620px);
+}
+.container-fluid.p-0.mb-5 {
+    height: auto !important;
+}
+#header-carousel,
+#header-carousel .carousel-inner,
+#header-carousel .carousel-item {
+    height: var(--hero-h) !important;
+    min-height: 0 !important;
+}
+#header-carousel .carousel-item img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100% !important;
+    object-fit: cover;
+    object-position: center 20%;
+}
+.page-header {
+    height: var(--hero-h) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    background-position: center 50% !important;
+}
+@media (max-width: 768px) {
+    :root {
+        --hero-h: 420px;
+    }
+}
+.page-header .breadcrumb-item.active {
+    color: rgba(255, 255, 255, .75) !important;
+}
+.page-header .breadcrumb a:hover {
+    color: var(--secondary) !important;
+}
+
+/*** Uniform service images (SOMJ Technology) ***/
+.service-item > img {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
 }
