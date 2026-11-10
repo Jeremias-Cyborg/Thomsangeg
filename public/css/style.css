@@ -655,3 +655,36 @@ body > * {
     aspect-ratio: 3 / 2;
     object-fit: cover;
 }
+
+/*** Language switch EN | ES (SOMJ Technology) ***/
+.lang-switch {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+}
+.lang-switch span {
+    color: #999999;
+}
+.lang-switch button {
+    border: 2px solid transparent;
+    background: transparent;
+    color: var(--dark);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 2px 8px;
+    cursor: pointer;
+    transition: .3s;
+}
+.lang-switch button:hover {
+    color: var(--secondary);
+}
+.lang-switch button.active {
+    background: var(--secondary);
+    color: #FFFFFF;
+}
+@media (max-width: 991.98px) {
+    .lang-switch {
+        padding-left: 0;
+    }
+}

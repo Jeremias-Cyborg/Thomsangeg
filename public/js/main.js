@@ -105,6 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             function showTopUpMessage(message, isError = false) {
+                if (window.i18nT) message = window.i18nT(message);
                 let topUpDiv = document.createElement('div');
                 topUpDiv.textContent = message;
                 topUpDiv.style.position = 'fixed';

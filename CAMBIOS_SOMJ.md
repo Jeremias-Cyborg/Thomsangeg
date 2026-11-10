@@ -65,9 +65,24 @@ No se ha tocado nada del servidor (app.js, package.json, .env, rutas, formulario
 - PENDIENTE: decidir si se añaden como servicios Welding & Fabrication, Mechanical Repairs y Construction.
 
 ## Actualización 6 — nuevos servicios (opción A: 9 servicios, 3×3)
-- service.html: 3 servicios nuevos con fotos reales (img/services/, 600×400):
+- service.html: 3 servicios nuevos con fotos reales (img/services/, 600×400), colocados en primera posición:
   Welding, Fabrication & Painting · Mechanical Repairs · CCU Handling & Logistics.
 - Todas las fotos de servicios con la misma proporción 3:2 (CSS .service-item > img).
 - Contadores "6 Core Services" → "9 Core Services" (index, feature, testimonial).
 - Datos estructurados (JSON-LD) de index.html: 9 servicios.
 - Construction NO se añadió como servicio (solo existe el proyecto del helipuerto): confirmar con el cliente.
+
+## Actualización 7 — web bilingüe EN / ES
+- Botón EN | ES en el menú de todas las páginas.
+- js/i18n.js: diccionario con todas las traducciones (sin API, sin coste, sin servicios externos).
+- Primera visita: español si el navegador está en español; si no, inglés. La elección se recuerda al cambiar de página.
+- Traduce textos, título de la pestaña, placeholders del formulario y los mensajes de envío del formulario (js/main.js usa window.i18nT).
+- Para añadir un texto nuevo: copiar el texto inglés exacto del HTML y añadir una línea "English": "Español" en el diccionario ES de js/i18n.js.
+- Nota SEO: Google indexa la versión en inglés (el HTML); el español se muestra al visitante con JavaScript.
+
+## Actualización 3 — equipo "Our Expert Workers" (10/11/2026, a petición del cliente)
+- about.html: retiradas las tarjetas de Martin Angel Edu (Lawyer & HR), Ernesto Ekube Molache (Senior Safety Officer) y la antigua de Constancio Maho Collins (worker-6.jpg).
+- Yolanda Isabel Thompson: cargo corregido a "HSE Manager" (ES: Responsable de HSE).
+- La foto worker-7.jpg es de Constancio Maho Collins: tarjeta corregida a "Workshop Manager and Company Technical Representative" (ES: Jefe de Taller y representante técnico de la empresa). Jose Elembo Wilasi ya no aparece.
+- js/i18n.js: añadidas las traducciones de los dos cargos nuevos.
+- worker-2, worker-3 y worker-6.jpg quedan sin uso (no se han borrado).
